@@ -1,0 +1,68 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.1.2'
+	id 'io.spring.dependency-management' version '1.1.0'
+}
+
+group = 'com.portfolio'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	/* spring boot */
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-security' // spring auth. Will use later but for now...
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.session:spring-session-jdbc'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	/* lombok */
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	
+	/* docker */
+	/* developmentOnly 'org.springframework.boot:spring-boot-docker-compose' */
+	
+	/* database */
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	implementation 'mysql:mysql-connector-java:8.0.27'
+	implementation "com.h2database:h2:1.4.200"
+	
+	/* testing */
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	
+	/* logging */
+    // Add Log4j2 Dependencies
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+
+	/* json format */
+	implementation 'com.google.code.gson:gson:2.8.8'
+}
+
+/* exclude default logging -> cannot be used with log4j2 dependency do not remove this if you are to use as it is*/
+configurations {
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
