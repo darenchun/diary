@@ -1,7 +1,6 @@
 package com.portfolio.diary.controllers.user_management;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,12 +27,9 @@ public class UserAccount_Controller {
         log.info("reqBody: {}", reqBody);
 
         
+
+        
         return ResponseEntity.ok(reqBody);
     }
 
-    @GetMapping(value = "/login")
-    public void login() {
-        log.info("logger!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    
-    }
 }
