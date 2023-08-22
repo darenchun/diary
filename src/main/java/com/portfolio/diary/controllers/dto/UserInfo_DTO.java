@@ -12,8 +12,9 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class UserInfo_DTO {
+    String userPk;
     String userName;
     String userEmail;
-    String phoneNumber;
+    String userPhoneNumber;
     String userPassword;
 }

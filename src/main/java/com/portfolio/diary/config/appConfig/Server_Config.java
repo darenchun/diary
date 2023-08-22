@@ -24,7 +24,7 @@ public class Server_Config implements WebMvcConfigurer {
 
     }
 
-    /* security filter chain for setting cors */
+    /* security filter chain for setting cors -> it is off for now. */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
