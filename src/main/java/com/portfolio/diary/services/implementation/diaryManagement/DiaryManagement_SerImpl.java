@@ -1,6 +1,7 @@
 package com.portfolio.diary.services.implementation.diaryManagement;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,10 +32,16 @@ public class DiaryManagement_SerImpl implements DiaryManagement_Service {
 
     @Override
     public DiaryArticle_Entity createDiaryArticle_Entity(DiaryArticle_Entity diary) {
-
         DiaryArticle_Entity de = diaryArticle_Repository.save(diary);
         log.info("saved article :" + de.toString());
         return de;
     }
+    
+    @Override
+    public Optional<DiaryArticle_Entity> getOneArticle_Entity(int diary_pk) {
+        Optional<DiaryArticle_Entity> de = diaryArticle_Repository.findById(diary_pk);
+        return de;
+    }
 
+    
 }

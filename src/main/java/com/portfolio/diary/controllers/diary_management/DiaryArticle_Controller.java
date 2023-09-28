@@ -1,10 +1,13 @@
 package com.portfolio.diary.controllers.diary_management;
 
 import java.sql.Timestamp;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
@@ -28,7 +31,28 @@ public class DiaryArticle_Controller {
         this.userService = userService;
     }
 
-    @PostMapping(value = "/newArticle", produces="text/plain;charset=UTF-8")
+    /* get article by article pk */
+    @GetMapping(value = "/getArticle", produces = "text/plain;charset=UTF-8")
+    public ResponseEntity<String> getOneAriticle(@RequestParam int diary_pk) {
+        log.info("request from frontend" + diary_pk);
+        /* calling service */
+        try {
+            Optional<DiaryArticle_Entity> optionalDiaryEntity = diaryService.getOneArticle_Entity(diary_pk);
+            if (optionalDiaryEntity.isPresent()) {
+                DiaryArticle_Entity de = optionalDiaryEntity.get();
+                /* setting response */
+                String reqBody = gson.toJson(de);
+                log.info("Response Body" + reqBody.toString());
+                return ResponseEntity.ok(reqBody);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /* write new article */
+    @PostMapping(value = "/newArticle", produces = "text/plain;charset=UTF-8")
     public ResponseEntity<String> createNewArticle(@RequestBody ArticleInfo_DTO diaryContents) {
         /* logging post contetns */
         log.info("Request body" + diaryContents.toString() + "currentTimeMills" + System.currentTimeMillis());
@@ -50,10 +74,10 @@ public class DiaryArticle_Controller {
         log.info("Diary content Info : " + de.toString());
         try {
             DiaryArticle_Entity savedEntity = diaryService.createDiaryArticle_Entity(de);
-                /* setting response */
-                String reqBody = gson.toJson(savedEntity);
-                log.info("Response Body" + reqBody.toString());
-                return ResponseEntity.ok(reqBody);
+            /* setting response */
+            String reqBody = gson.toJson(savedEntity);
+            log.info("Response Body" + reqBody.toString());
+            return ResponseEntity.ok(reqBody);
         } catch (Exception e) {
             e.printStackTrace();
         }

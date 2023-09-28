@@ -53,7 +53,22 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class Server_Config implements WebMvcConfigurer {
     
-    
+    /* 사용자 세부 정보 : 서버 메모리 저장 후 비교 */
+    @Bean
+    public UserDetailsService userDetailsService() {
+        UserDetails userDetails = User.builder()
+                .username("user")
+                .password(passwordEncoder().encode("password"))
+                .roles("USER")
+                .build();
+        return new InMemoryUserDetailsManager(userDetails);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -61,17 +76,14 @@ public class Server_Config implements WebMvcConfigurer {
 
         // Allow requests from these origins (you can specify multiple origins)
         config.addAllowedOrigin("http://localhost:3000"); // Replace with your frontend URL
-
         // Allow specific HTTP methods
         config.addAllowedMethod("GET");
         config.addAllowedMethod("POST");
         config.addAllowedMethod("PUT");
         config.addAllowedMethod("DELETE");
         config.addAllowedMethod("OPTIONS");
-
         // Allow specific HTTP headers
         config.addAllowedHeader("*");
-
         // Allow credentials (e.g., cookies)
         config.setAllowCredentials(true);
 
@@ -85,18 +97,15 @@ public class Server_Config implements WebMvcConfigurer {
             throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-                .oidc(Customizer.withDefaults()); // Enable OpenID Connect 1.0
+                .oidc(Customizer.withDefaults());
 
-        // Redirect to the login page when not authenticated from the
-        // authorization endpoint
+        // Redirect to the login page when not authenticated from the authorization endpoint
         http.exceptionHandling((exceptions) -> exceptions
                 .defaultAuthenticationEntryPointFor(
                         new LoginUrlAuthenticationEntryPoint("/login"),
                         new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
-                // Accept access tokens for User Info and/or Client Registration
                 .oauth2ResourceServer((resourceServer) -> resourceServer
                         .jwt(Customizer.withDefaults()));
-
         return http.build();
     }
 
@@ -110,32 +119,12 @@ public class Server_Config implements WebMvcConfigurer {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/", "/**").permitAll()
                         .anyRequest().authenticated())
-                // Form login handles the redirect to the login page from the
-                // authorization server filter chain
                 .formLogin(Customizer.withDefaults());
 
         return http.build();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails userDetails = User.builder()
-                .username("user")
-                .password(passwordEncoder().encode("password"))
-                .roles("USER")
-                .build();
-                
-        log.info("UserDetailInformation : "+ userDetails.getPassword());
-        log.info("UserDetailInformation : "+ userDetails.getUsername());
-        log.info("UserDetailInformation : "+ userDetails.getAuthorities());
-        return new InMemoryUserDetailsManager(userDetails);
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
+    /* Oauth client Registration */
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
         RegisteredClient oidcClient = RegisteredClient.withId(UUID.randomUUID().toString())
@@ -154,6 +143,7 @@ public class Server_Config implements WebMvcConfigurer {
         return new InMemoryRegisteredClientRepository(oidcClient);
     }
 
+    /* jwt 내용 생성 코드 */
     @Bean
     public JWKSource<SecurityContext> jwkSource() {
         KeyPair keyPair = generateRsaKey();
@@ -167,6 +157,7 @@ public class Server_Config implements WebMvcConfigurer {
         return new ImmutableJWKSet<>(jwkSet);
     }
 
+    /* jwt 내용 생성 시 필요한 rsa 키 생성 코드  */
     private static KeyPair generateRsaKey() {
         KeyPair keyPair;
         try {
@@ -179,11 +170,13 @@ public class Server_Config implements WebMvcConfigurer {
         return keyPair;
     }
 
+    /* jwt front<->back 객체 내용 변환 */
     @Bean
     public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
         return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
     }
 
+    /* 권한 세팅 설정 */
     @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder().build();

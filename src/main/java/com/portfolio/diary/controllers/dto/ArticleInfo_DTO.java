@@ -12,5 +12,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class ArticleInfo_DTO {
-    String diaryArticle;
+    public String diary_pk;
+    public String diaryArticle;
 }
